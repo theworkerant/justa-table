@@ -32,6 +32,12 @@ export default Ember.Component.extend({
   */
   rowClasses: null,
 
+  /**
+    Name of data property for row groups
+    @public
+  */
+  rowGroupDataName: 'rowData',
+
   init() {
     this._super(...arguments);
     this._allColumns = new A();
@@ -133,12 +139,13 @@ export default Ember.Component.extend({
       }
 
       // TODO make this smarter by taking option if we should do this
-      let shouldFetch = isEmpty(rowGroup.data) && !rowGroup.isCollapsed;
+      let rowData = rowGroup.get(this.get('rowGroupDataName'));
+      let shouldFetch = isEmpty(rowData) && !rowGroup.isCollapsed;
 
       if (shouldFetch) {
         set(rowGroup, 'loading', true);
         this.attrs.onRowExpand(rowGroup).then((data) => {
-          set(rowGroup, 'data', rowGroup.data.concat(data));
+          set(rowGroup, this.get('rowGroupDataName'), rowData.concat(data));
         }).finally(() => {
           set(rowGroup, 'loading', false);
         });
