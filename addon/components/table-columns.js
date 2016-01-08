@@ -139,7 +139,7 @@ export default Ember.Component.extend({
       }
 
       // TODO make this smarter by taking option if we should do this
-      let rowData = rowGroup.get(this.get('rowGroupDataName'));
+      let rowData = get(rowGroup, this.get('rowGroupDataName'));
       let shouldFetch = isEmpty(rowData) && !rowGroup.isCollapsed;
 
       if (shouldFetch) {

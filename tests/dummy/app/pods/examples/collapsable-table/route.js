@@ -7,17 +7,17 @@ export default Ember.Route.extend({
       {
         label: 'Happy Users',
         isCollapsed: true,
-        data: []
+        childRows: []
       },
       {
         label: 'Crazy Users',
         isCollapsed: true,
-        data: []
+        childRows: []
       },
       {
         label: 'Super Users',
         isCollapsed: true,
-        data: []
+        childRows: []
       }
     ];
 
@@ -38,7 +38,7 @@ export default Ember.Route.extend({
         users.push(user);
       }
 
-      group.data = group.data.concat(users);
+      group.childRows = group.childRows.concat(users);
     });
 
     return userGroups;
