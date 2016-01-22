@@ -4,7 +4,8 @@ import generateUsers from 'dummy/utils/generate-users';
 const {
   A,
   Controller,
-  computed
+  computed,
+  RSVP
 } = Ember;
 
 export default Controller.extend({
@@ -20,7 +21,7 @@ export default Controller.extend({
   actions: {
     loadMoreUsers() {
       if (this.get('onLastPage')) {
-        return false;
+        return RSVP.resolve(false);
       }
       let newUsers = generateUsers(10);
       let currentPage = this.get('page');
@@ -28,6 +29,7 @@ export default Controller.extend({
 
       users.pushObjects(newUsers);
       this.set('page', currentPage + 1);
+      return RSVP.resolve(users);
     }
   }
 });
