@@ -12,7 +12,7 @@ const {
 export default Component.extend({
   layout,
   classNames: ['justa-table'],
-  classNameBindings: ['isLoading'],
+  classNameBindings: ['isLoading', 'stickyHeader'],
 
   init() {
     this._super(...arguments);
@@ -21,6 +21,20 @@ export default Component.extend({
       this.attrs['on-load-more-rows'] = RSVP.resolve();
     }
   },
+
+  didInsertElement() {
+    this._super();
+    Ember.run.scheduleOnce('afterRender', this, this.afterRenderEvent);
+  },
+  afterRenderEvent() {
+    $('.justa-table.sticky-header').find('table').stickyTableHeaders();
+  },
+
+  /**
+    Sticky headers keep table header in a fixed position
+    @public
+  */
+  stickyHeader: false,
 
   /**
     If the table should use pagination. Will fire the 'on-load-more-rows'
