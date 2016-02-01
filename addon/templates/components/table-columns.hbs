@@ -1,14 +1,17 @@
 <table class="table">
   <thead>
-    <tr>
-      {{#each columns as |column|}}
-        {{component column.headerComponent
-          table=table
-          column=column
-          classNames=headerClassNames
-          onColumnWidthChange=(action 'columnWidthChanged')}}
-      {{/each}}
-    </tr>
+    {{#sortable-objects sortableObjectList=sortableObjectList sortEndAction='sortEndAction'}}
+      <tr>
+        {{#each columns as |column|}}
+            {{component column.headerComponent
+              draggableObject=column.draggableObject
+              table=table
+              column=column
+              classNames=headerClassNames
+              onColumnWidthChange=(action 'columnWidthChanged')}}
+        {{/each}}
+      </tr>
+    {{/sortable-objects}}
   </thead>
 
   <tbody>

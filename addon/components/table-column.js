@@ -17,6 +17,8 @@ export default Component.extend({
   classNameBindings: ['alignCenter:center', 'alignRight:right', 'shouldUseFakeRowspan:fake-rowspan'],
   alignCenter: computed.equal('align', 'center'),
   alignRight: computed.equal('align', 'right'),
+  draggable: true,
+  draggableObject: null,
 
   /**
     The header component this column should use to render its header.

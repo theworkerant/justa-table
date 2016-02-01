@@ -75,17 +75,18 @@ export default Ember.Component.extend({
     @returns { Array } Array of unique columns
     @public
   */
-  columns: computed('_allColumns.[]', function columns() {
+  columns: computed('_allColumns.[]', '_allColumns.@each.ordinal', function columns() {
     let uniqueColumns = new A();
     this.get('_allColumns').forEach((column) => {
       let headerName = column.get('headerName');
+
       let existingHeaderNames = new A(uniqueColumns.mapBy('headerName'));
       if (!existingHeaderNames.contains(headerName)) {
         uniqueColumns.push(column);
       }
     });
 
-    return uniqueColumns.sortBy('index');
+    return uniqueColumns.sortBy('ordinal');
   }),
 
   /**
@@ -155,6 +156,16 @@ export default Ember.Component.extend({
 
     columnWidthChanged(/* column, newWidth */) {
       // no-op
+    },
+    dragStart(object) {
+      console.log('drag start', object);
+    },
+    sortEndAction() {
+      let headers = this.get('sortableObjectList');
+      headers.forEach(function(header, index) {
+        header.index = index;
+      });
+
     }
   }
 });

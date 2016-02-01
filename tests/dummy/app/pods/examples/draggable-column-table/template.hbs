@@ -1,0 +1,13 @@
+{{#justa-table content=model.users as |table|}}
+  {{#table-columns table=table sortableObjectList=beerObjectList as |row|}}
+    {{#each beerObjectList as |attribute index|}}
+      {{table-column
+        draggableObject=attribute
+        row=row
+        width=attribute.width
+        ordinal=index
+        headerName=attribute.headerName
+        valueBindingPath=attribute.valueBindingPath }}
+    {{/each}}
+  {{/table-columns}}
+{{/justa-table}}

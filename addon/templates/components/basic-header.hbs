@@ -1,4 +1,11 @@
-{{column.headerName}}
-{{#if resizable}}
-  {{column-resize-handle column=column onColumnWidthChange=(action 'onColumnWidthChange')}}
-{{/if}}
+{{#draggable-object
+  content=draggableObject
+  overrideClass='sortObject'
+  tagName='span'
+  isSortable=true}}
+
+  {{draggableObject.headerName}}
+  {{#if resizable}}
+    {{column-resize-handle column=column onColumnWidthChange=(action 'onColumnWidthChange')}}
+  {{/if}}
+{{/draggable-object}}
