@@ -17,13 +17,19 @@ export default Component.extend({
   classNameBindings: ['alignCenter:center', 'alignRight:right', 'shouldUseFakeRowspan:fake-rowspan'],
   alignCenter: computed.equal('align', 'center'),
   alignRight: computed.equal('align', 'right'),
-
   /**
     The header component this column should use to render its header.
     @public
     @default 'basic-header'
   */
   headerComponent: 'basic-header',
+
+  /**
+    Rows whose value matches the prior row will be returned as null
+    resulting in them appearing grouped
+    @public
+  */
+  groupWithPriorRow: false,
 
   /**
     The width of this column in pixels.
@@ -94,6 +100,8 @@ export default Component.extend({
   /**
     Return the value for the cell based on row.valueBindingPath. Only used if
     a block is not passed, the path is provided, and the row is not empty.
+    If this column groups values together, the value will be returned as null
+    if it matches the prior row.
     @private
   */
   _value: computed('valueBindingPath', 'row', function() {
@@ -105,7 +113,22 @@ export default Component.extend({
       return null;
     }
 
-    return get(row, path);
+    let currentValue = get(row, path);
+    let groupWithPriorRow = this.get('groupWithPriorRow');
+
+    if (groupWithPriorRow) {
+      let parentView = this.get('parentView');
+      let lastValue = parentView.get(`values.${path}`);
+
+      if (currentValue === lastValue) {
+        return null;
+      } else {
+        parentView.set(`values.${path}`, currentValue);
+        return currentValue;
+      }
+    } else {
+      return currentValue;
+    }
   }),
 
   /**
