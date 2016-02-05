@@ -12,7 +12,7 @@ const {
 export default Component.extend({
   layout,
   classNames: ['justa-table'],
-  classNameBindings: ['isLoading', 'stickyHeader'],
+  classNameBindings: ['isLoading:loading:loaded', 'stickyHeader'],
 
   init() {
     this._super(...arguments);
@@ -108,7 +108,7 @@ export default Component.extend({
         let isFunction  = typeof returnValue === 'function';
 
         Ember.assert('on-load-more-rows must use a closure action', isFunction);
-
+        this.set('isLoading', true);
         let promise = this.attrs['on-load-more-rows']();
 
         if (!promise.then) {
@@ -116,7 +116,6 @@ export default Component.extend({
             resolve(false);
           });
         }
-
         promise.finally(() => this.set('isLoading', false));
         return promise;
       }

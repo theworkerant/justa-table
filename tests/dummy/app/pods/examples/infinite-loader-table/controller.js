@@ -30,7 +30,9 @@ export default Controller.extend({
       users.pushObjects(newUsers);
       this.set('page', currentPage + 1);
       return new RSVP.Promise((resolve) => {
-        resolve(users);
+        Ember.run.later(this, () => {
+          resolve(users);
+        }, 1500);
       });
     }
   }
