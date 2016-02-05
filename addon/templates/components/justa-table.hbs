@@ -6,4 +6,5 @@
 
 {{#if paginate}}
   {{in-viewport-checker on-enter-viewport=(action 'viewportEntered')}}
+  <div class="justa-table-loader {{if isLoading 'loading' 'loaded'}}"></div>
 {{/if}}
