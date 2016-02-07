@@ -8,12 +8,14 @@ const {
   isEmpty,
   isNone,
   computed,
+  RSVP,
   computed: { readOnly }
 } = Ember;
 
 export default Ember.Component.extend({
   layout,
   classNames: ['table-columns'],
+  classNameBindings: ['fixedHeight'],
 
   /**
     The parent table component, it is expected to be passed in.
@@ -68,6 +70,12 @@ export default Ember.Component.extend({
     return new Ember.Handlebars.SafeString('');
   }),
 
+  paginate: computed.alias('table.paginate'),
+
+  fixedHeight: computed('table.paginate', 'table.height', function() {
+    return (this.get('table.paginate') || this.get('table.height'));
+  }),
+
   /**
     Keeps track of all unique columns. Used to render the th's of the table.
     Uniques on header name.
@@ -110,11 +118,13 @@ export default Ember.Component.extend({
   },
 
   didInsertElement() {
+    this.$().on('scroll', this._scrollFixedIfPresent.bind(this));
     this.$().on('mouseenter', 'tr', this._onRowEnter.bind(this));
     this.$().on('mouseleave', 'tr', this._onRowLeave.bind(this));
   },
 
   willDestroyElement() {
+    this.$().off('scroll', this._scrollFixedIfPresent.bind(this));
     this.$().off('mouseenter', 'tr', this._onRowEnter.bind(this));
     this.$().off('mouseleave', 'tr', this._onRowLeave.bind(this));
   },
@@ -126,6 +136,14 @@ export default Ember.Component.extend({
 
   _onRowLeave() {
     this.getAttr('table').$('tr').removeClass('hover');
+  },
+
+  _scrollFixedIfPresent(event) {
+    let siblingFixedTable = this.table.$('.fixed-table-columns');
+    if (siblingFixedTable) {
+      let scrollAmount = event.target.scrollTop;
+      siblingFixedTable.scrollTop(scrollAmount);
+    }
   },
 
   actions: {
@@ -154,6 +172,26 @@ export default Ember.Component.extend({
 
     columnWidthChanged(/* column, newWidth */) {
       // no-op
+    },
+    viewportEntered() {
+      let parentView = this.get('parentView');
+      let attr = parentView.getAttr('on-load-more-rows');
+      if (attr) {
+        let isFunction  = typeof attr === 'function';
+
+        Ember.assert('on-load-more-rows must use a closure action', isFunction);
+
+        let promise = attr();
+
+        if (!promise.then) {
+          promise = new RSVP.Promise((resolve) => {
+            resolve(false);
+          });
+        }
+
+        promise.finally(() => this.set('parentView.isLoading', false));
+        return promise;
+      }
     }
   }
 });
