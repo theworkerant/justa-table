@@ -99,26 +99,5 @@ export default Component.extend({
 
     fixedHeader.height(maxHeight);
     columnHeader.height(maxHeight);
-  },
-
-  actions: {
-    viewportEntered() {
-      if (this.getAttr('on-load-more-rows')) {
-        let returnValue = this.getAttr('on-load-more-rows');
-        let isFunction  = typeof returnValue === 'function';
-
-        Ember.assert('on-load-more-rows must use a closure action', isFunction);
-        this.set('isLoading', true);
-        let promise = this.attrs['on-load-more-rows']();
-
-        if (!promise.then) {
-          promise = new RSVP.Promise((resolve) => {
-            resolve(false);
-          });
-        }
-        promise.finally(() => this.set('isLoading', false));
-        return promise;
-      }
-    }
   }
 });

@@ -1,10 +1,8 @@
 import Ember from 'ember';
 import generateUsers from 'dummy/utils/generate-users';
 
-const { Route } = Ember;
-
-export default Route.extend({
+export default Ember.Route.extend({
   model() {
-    return generateUsers(10);
+    return generateUsers(10, true);
   }
 });
