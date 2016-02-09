@@ -132,8 +132,8 @@ export default Ember.Component.extend({
   },
 
   _onRowEnter() {
-    let rowIndex = this.$('tr').index(this.$('tr:hover'));
-    this.getAttr('table').$(`tr.table-row:nth-child(${rowIndex})`).addClass('hover');
+    let rowIndex = this.$('tbody tr').index(this.$('tr:hover'));
+    this.getAttr('table').$(`tr.table-row:nth-child(${rowIndex + 1})`).addClass('hover');
   },
 
   _onRowLeave() {
