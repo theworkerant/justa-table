@@ -177,6 +177,8 @@ export default Ember.Component.extend({
     },
     viewportEntered() {
       let parentView = this.get('parentView');
+      this.set('parentView.isLoading', true);
+
       let attr = parentView.getAttr('on-load-more-rows');
       if (attr) {
         let isFunction  = typeof attr === 'function';
