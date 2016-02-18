@@ -1,4 +1,6 @@
-{{column.headerName}}
-{{#if resizable}}
-  {{column-resize-handle column=column onColumnWidthChange=(action 'onColumnWidthChange')}}
-{{/if}}
+<div class='th-inner'>
+  {{column.headerName}}
+  {{#if resizable}}
+    {{column-resize-handle column=column onColumnWidthChange=(action 'onColumnWidthChange')}}
+  {{/if}}
+</div>
