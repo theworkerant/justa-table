@@ -124,7 +124,7 @@ export default Ember.Component.extend({
     let columns = this.get('_allColumns');
     column.index = column.index || -1;
     columns.addObject(column);
-    Ember.run.debounce(this, this._computeCss, 350);
+    Ember.run.debounce(this, this._computeCss, 350, true);
   },
 
   /**
@@ -136,7 +136,7 @@ export default Ember.Component.extend({
   unregisterColumn(column) {
     let allColumns = this.get('_allColumns');
     allColumns.removeObject(column);
-    Ember.run.debounce(this, this._computeCss, 350);
+    Ember.run.debounce(this, this._computeCss, 350, true);
   },
 
   hasFixedHeight: computed('table.fixedHeight', function hasFixedHeight() {
@@ -176,8 +176,7 @@ export default Ember.Component.extend({
 
   didInsertElement() {
     this._super(...arguments);
-
-    this.$().on('scroll', this._scrollFixedIfPresent.bind(this));
+    this.$('tbody').on('scroll', this._scrollFixedIfPresent.bind(this));
     this.$().on('mouseenter', 'tr', this._onRowEnter.bind(this));
     this.$().on('mouseleave', 'tr', this._onRowLeave.bind(this));
   },
@@ -207,7 +206,7 @@ export default Ember.Component.extend({
   },
 
   _scrollFixedIfPresent(event) {
-    let siblingFixedTable = this.table.$('.fixed-table-columns');
+    let siblingFixedTable = this.table.$('.fixed-table-columns tbody');
     if (siblingFixedTable) {
       let scrollAmount = event.target.scrollTop;
       siblingFixedTable.scrollTop(scrollAmount);
@@ -239,7 +238,6 @@ export default Ember.Component.extend({
     },
 
     columnWidthChanged(/* column, newWidth */) {
-      console.debug('columnWidthChanged')
       // no-op
     },
     viewportEntered() {

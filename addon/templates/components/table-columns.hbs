@@ -42,8 +42,8 @@
         </tr>
       {{/each}}
     {{/if}}
+    {{#if paginate}}
+      {{in-viewport-checker on-enter-viewport=(action 'viewportEntered')}}
+    {{/if}}
   </tbody>
-  {{#if paginate}}
-    {{in-viewport-checker on-enter-viewport=(action 'viewportEntered')}}
-  {{/if}}
 </table>
