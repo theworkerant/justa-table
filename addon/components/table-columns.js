@@ -8,12 +8,18 @@ const {
   isEmpty,
   isNone,
   computed,
+  RSVP,
   computed: { readOnly }
 } = Ember;
+
+let uuid = 0;
 
 export default Ember.Component.extend({
   layout,
   classNames: ['table-columns'],
+  headerClassNames: [],
+  values: {},
+  classNameBindings: ['fixedHeight', 'columnId'],
 
   /**
     The parent table component, it is expected to be passed in.
@@ -39,9 +45,24 @@ export default Ember.Component.extend({
   */
   rowGroupDataName: readOnly('table.rowGroupDataName'),
 
+  /**
+    Unique ID for the table-columns component
+    @private
+  */
+  columnId: computed(function columnId() {
+    return `justa-table-columns-${++uuid}`;
+  }),
+
+  /**
+    The stylesheet to attach css rules to. Only used for fixed height tables.
+    @private
+  */
+  stylesheet: null,
+
   init() {
     this._super(...arguments);
     this._allColumns = new A();
+    this.set('stylesheet', createStylesheet(this.get('columnId')));
   },
 
   /**
@@ -66,6 +87,12 @@ export default Ember.Component.extend({
     }
 
     return new Ember.Handlebars.SafeString('');
+  }),
+
+  paginate: computed.alias('table.paginate'),
+
+  fixedHeight: computed('table.paginate', 'table.height', function() {
+    return (this.get('table.paginate') || this.get('table.height'));
   }),
 
   /**
@@ -96,6 +123,7 @@ export default Ember.Component.extend({
     let columns = this.get('_allColumns');
     column.index = column.index || -1;
     columns.addObject(column);
+    Ember.run.scheduleOnce('afterRender', this, this._computeCss);
   },
 
   /**
@@ -107,25 +135,81 @@ export default Ember.Component.extend({
   unregisterColumn(column) {
     let allColumns = this.get('_allColumns');
     allColumns.removeObject(column);
+    Ember.run.scheduleOnce('afterRender', this, this._computeCss);
+  },
+
+  hasFixedHeight: computed('table.fixedHeight', function hasFixedHeight() {
+    let fixedHeight = this.get('table.fixedHeight');
+    return fixedHeight !== false && fixedHeight > 0;
+  }),
+
+  /**
+   * The fixed height style for the `<tbody>` element
+   * @private
+   */
+  tbodyStyle: computed('hasFixedHeight', 'columns.@each.width', function tbodyStyle() {
+    let hasFixedHeight = this.get('hasFixedHeight');
+    if (hasFixedHeight) {
+      let fixedHeight = this.get('table.fixedHeight');
+      let width = this.get('columns').reduce((a, b) => a + b.get('width'), 0);
+      return Ember.String.htmlSafe(`width:${width}px;height:${fixedHeight}px`);
+    }
+    return Ember.String.htmlSafe('');
+  }),
+
+  _computeCss() {
+    if (this.isDestroyed || this.isDestroying || !this.get('hasFixedHeight')) {
+      return;
+    }
+
+    let columns = this.get('columns');
+    let columnId = this.get('columnId');
+    let { sheet } = this.get('stylesheet');
+
+    for (let i = 0; i < columns.length; ++i) {
+      let column = columns.objectAt(i);
+
+      sheet.insertRule(`.${columnId} td:nth-child(${i + 1}) { min-width: ${column.get('width')}px; max-width: ${column.get('width')}px; }`, i);
+    }
   },
 
   didInsertElement() {
+    this._super(...arguments);
+    this.$('tbody').on('scroll', this._scrollFixedIfPresent.bind(this));
     this.$().on('mouseenter', 'tr', this._onRowEnter.bind(this));
     this.$().on('mouseleave', 'tr', this._onRowLeave.bind(this));
   },
 
   willDestroyElement() {
+    this._super(...arguments);
+
+    this.$().off('scroll', this._scrollFixedIfPresent.bind(this));
     this.$().off('mouseenter', 'tr', this._onRowEnter.bind(this));
     this.$().off('mouseleave', 'tr', this._onRowLeave.bind(this));
+
+    let stylesheet = this.get('stylesheet');
+    if (stylesheet) {
+      document.head.removeChild(stylesheet);
+      this.set('stylesheet', null);
+      stylesheet = null;
+    }
   },
 
   _onRowEnter() {
-    let rowIndex = this.$('tr').index(this.$('tr:hover'));
-    this.getAttr('table').$(`tr.table-row:nth-child(${rowIndex})`).addClass('hover');
+    let rowIndex = this.$('tbody tr').index(this.$('tr:hover'));
+    this.getAttr('table').$(`tr.table-row:nth-child(${rowIndex + 1})`).addClass('hover');
   },
 
   _onRowLeave() {
     this.getAttr('table').$('tr').removeClass('hover');
+  },
+
+  _scrollFixedIfPresent(event) {
+    let siblingFixedTable = this.table.$('.fixed-table-columns tbody');
+    if (siblingFixedTable) {
+      let scrollAmount = event.target.scrollTop;
+      siblingFixedTable.scrollTop(scrollAmount);
+    }
   },
 
   actions: {
@@ -154,6 +238,36 @@ export default Ember.Component.extend({
 
     columnWidthChanged(/* column, newWidth */) {
       // no-op
+    },
+    viewportEntered() {
+      let parentView = this.get('parentView');
+      this.set('parentView.isLoading', true);
+
+      let attr = parentView.getAttr('on-load-more-rows');
+      if (attr) {
+        let isFunction  = typeof attr === 'function';
+
+        Ember.assert('on-load-more-rows must use a closure action', isFunction);
+
+        let promise = attr();
+
+        if (!promise.then) {
+          promise = new RSVP.Promise((resolve) => {
+            resolve(false);
+          });
+        }
+
+        promise.finally(() => this.set('parentView.isLoading', false));
+        return promise;
+      }
     }
   }
 });
+
+function createStylesheet(columnId) {
+  let stylesheet = document.createElement('style');
+  stylesheet.id = `styles-for-${columnId}`;
+  stylesheet.type = 'text/css';
+  document.head.appendChild(stylesheet);
+  return stylesheet;
+}

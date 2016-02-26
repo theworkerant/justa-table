@@ -1,10 +1,11 @@
-{{#justa-table content=model paginate=true on-load-more-rows=(action 'loadMoreUsers') as |table|}}
+{{#justa-table content=model paginate=true stickyHeader=true on-load-more-rows=(action 'loadMoreUsers') as |table|}}
   {{#table-columns table=table as |row|}}
 
     {{table-column
       row=row
       width=190
       headerName='Name'
+      groupBy=true
       valueBindingPath='displayName'}}
 
     {{#table-column headerName='Image'}}

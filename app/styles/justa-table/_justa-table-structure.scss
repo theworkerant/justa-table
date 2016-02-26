@@ -41,6 +41,10 @@
 
   .table-columns {
     overflow: auto;
+    &.fixed-height {
+      overflow-x: scroll;
+      overflow-y: scroll;
+    }
   }
 
   .fixed-table-columns {
@@ -48,6 +52,12 @@
       // we have to set this to something, choose default 1 column width.
       // expected that fixed columns have set widths which will override this
       // width: 100px;
+    }
+    &.fixed-height {
+      float: left;
+      overflow-y: hidden;
+      overflow-x: hidden;
+      height: 800px;
     }
   }
 
@@ -68,5 +78,19 @@
     height: 100%;
     top: 0;
     right: 0;
+  }
+}
+
+.justa-fixed-height {
+  tbody {
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+    height: 200px;
+  }
+
+  .fixed-table-columns tbody {
+    overflow: hidden;
   }
 }
