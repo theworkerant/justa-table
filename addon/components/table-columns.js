@@ -62,7 +62,6 @@ export default Ember.Component.extend({
   init() {
     this._super(...arguments);
     this._allColumns = new A();
-
     this.set('stylesheet', createStylesheet(this.get('columnId')));
   },
 
@@ -124,7 +123,7 @@ export default Ember.Component.extend({
     let columns = this.get('_allColumns');
     column.index = column.index || -1;
     columns.addObject(column);
-    Ember.run.debounce(this, this._computeCss, 350, true);
+    Ember.run.scheduleOnce('afterRender', this, this._computeCss);
   },
 
   /**
@@ -136,7 +135,7 @@ export default Ember.Component.extend({
   unregisterColumn(column) {
     let allColumns = this.get('_allColumns');
     allColumns.removeObject(column);
-    Ember.run.debounce(this, this._computeCss, 350, true);
+    Ember.run.scheduleOnce('afterRender', this, this._computeCss);
   },
 
   hasFixedHeight: computed('table.fixedHeight', function hasFixedHeight() {
@@ -159,7 +158,7 @@ export default Ember.Component.extend({
   }),
 
   _computeCss() {
-    if (!this.get('hasFixedHeight')) {
+    if (this.isDestroyed || this.isDestroying || !this.get('hasFixedHeight')) {
       return;
     }
 
