@@ -5,9 +5,9 @@ moduleForComponent('justa-table', 'Integration | Component | justa table', {
   integration: true
 });
 
-function getContainer(context) {
-  return context.$(`.justa-table`);
-}
+// function getContainer(context) {
+//   return context.$(`.justa-table`);
+// }
 
 function getCell(context, rowObject) {
   let { row, cell } = rowObject;
@@ -92,7 +92,7 @@ test('Places null value in a row if groupWithPriorRow is true and the prior reco
   this.set('content', content);
 
   this.render(hbs`
-    {{#justa-table stickyHeader=true content=content as |table|}}
+    {{#justa-table content=content as |table|}}
       {{#table-columns  table=table as |row|}}
         {{table-column
           row=row
@@ -113,54 +113,6 @@ test('Places null value in a row if groupWithPriorRow is true and the prior reco
   assert.equal(getCell(this, { row: 1, cell: 1 }).text().trim(), 'Quentin Tarantino', 'first cell should be Quentin Tarantino');
   assert.equal(getCell(this, { row: 2, cell: 1 }).text().trim(), '', 'second row first cell should be empty');
   assert.equal(getCell(this, { row: 3, cell: 1 }).text().trim(), 'JJ Abrams', 'third row first cell should be JJ Abrams');
-});
-
-test('adds sticky-header class to containing div if stickyHeader is passed to justa-table as true', function(assert) {
-  let content = [
-    { name: 'Fred' },
-    { name: 'Wilma' },
-    { name: undefined }
-  ];
-
-  this.set('content', content);
-
-  this.render(hbs`
-    {{#justa-table stickyHeader=true content=content as |table|}}
-      {{#table-columns  table=table as |row|}}
-        {{table-column
-          row=row
-          headerName='foo'
-          useFakeRowspan=true
-          valueBindingPath='name'}}
-
-      {{/table-columns}}
-    {{/justa-table}}
-  `);
-  assert.ok(getContainer(this).hasClass('sticky-header'));
-});
-
-test('does not add sticky-header class to header rows if stickyHeader is passed to table-columns is not true', function(assert) {
-  let content = [
-    { name: 'Fred' },
-    { name: 'Wilma' },
-    { name: undefined }
-  ];
-
-  this.set('content', content);
-
-  this.render(hbs`
-    {{#justa-table content=content as |table|}}
-      {{#table-columns table=table as |row|}}
-        {{table-column
-          row=row
-          headerName='foo'
-          useFakeRowspan=true
-          valueBindingPath='name'}}
-
-      {{/table-columns}}
-    {{/justa-table}}
-  `);
-  assert.notOk(getContainer(this).hasClass('sticky-header'));
 });
 
 test('passes rowHeight to rows', function(assert) {
