@@ -9,7 +9,8 @@ const {
   isNone,
   computed,
   RSVP,
-  computed: { readOnly }
+  computed: { readOnly },
+  observer
 } = Ember;
 
 let uuid = 0;
@@ -54,6 +55,17 @@ export default Ember.Component.extend({
   }),
 
   /**
+    Set to true to trigger recompute of column stylesheet
+    @public
+  */
+  columnsNeedRecompute: false,
+
+  recomputedColumns: observer('columnsNeedRecompute', function () {
+    Ember.run.next(() => { this._computeCss(); }
+    });
+  }),
+
+  /**
     The stylesheet to attach css rules to. Only used for fixed height tables.
     @private
   */
@@ -62,7 +74,7 @@ export default Ember.Component.extend({
   init() {
     this._super(...arguments);
     this._allColumns = new A();
-    this.set('stylesheet', createStylesheet(this.get('columnId')));
+    Ember.run.scheduleOnce('afterRender', this, this._computeCss);
   },
 
   /**
@@ -123,7 +135,6 @@ export default Ember.Component.extend({
     let columns = this.get('_allColumns');
     column.index = column.index || -1;
     columns.addObject(column);
-    Ember.run.scheduleOnce('afterRender', this, this._computeCss);
   },
 
   /**
@@ -135,7 +146,6 @@ export default Ember.Component.extend({
   unregisterColumn(column) {
     let allColumns = this.get('_allColumns');
     allColumns.removeObject(column);
-    Ember.run.scheduleOnce('afterRender', this, this._computeCss);
   },
 
   hasFixedHeight: computed('table.fixedHeight', function hasFixedHeight() {
@@ -164,7 +174,7 @@ export default Ember.Component.extend({
 
     let columns = this.get('columns');
     let columnId = this.get('columnId');
-    let { sheet } = this.get('stylesheet');
+    let { sheet } = this._resetStylesheet(columnId);
 
     for (let i = 0; i < columns.length; ++i) {
       let column = columns.objectAt(i);
@@ -210,6 +220,18 @@ export default Ember.Component.extend({
       let scrollAmount = event.target.scrollTop;
       siblingFixedTable.scrollTop(scrollAmount);
     }
+  },
+
+  _resetStylesheet(columnId) {
+    let stylesheet = this.get('stylesheet');
+    if (stylesheet) {
+      document.head.removeChild(stylesheet);
+      this.set('stylesheet', null);
+      stylesheet = null;
+    }
+
+    this.set('stylesheet', createStylesheet(this.get('columnId')));
+    return this.get('stylesheet');
   },
 
   actions: {
