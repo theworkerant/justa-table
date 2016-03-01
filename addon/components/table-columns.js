@@ -61,8 +61,7 @@ export default Ember.Component.extend({
   columnsNeedRecompute: false,
 
   recomputedColumns: observer('columnsNeedRecompute', function () {
-    Ember.run.next(() => { this._computeCss(); }
-    });
+    Ember.run.next(() => { this._computeCss(); });
   }),
 
   /**
