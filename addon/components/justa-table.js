@@ -22,34 +22,6 @@ export default Component.extend({
     }
   },
 
-  didInsertElement() {
-    this._super(...arguments);
-    this._uninstallStickyHeaders();
-    Ember.run.scheduleOnce('afterRender', this, this._installStickyHeaders);
-  },
-
-  willDestroyElement() {
-    this._uninstallStickyHeaders();
-  },
-
-  _installStickyHeaders() {
-    if (this.get('stickyHeader')) {
-      this.$('table').stickyTableHeaders();
-    }
-  },
-
-  _uninstallStickyHeaders() {
-    if (this.get('stickyHeader')) {
-      this.$('table').stickyTableHeaders('destroy');
-    }
-  },
-
-  /**
-    Sticky headers keep table header in a fixed position
-    @public
-  */
-  stickyHeader: false,
-
   /**
     If the table should use pagination. Will fire the 'on-load-more-rows'
     action when it enters the viewport.

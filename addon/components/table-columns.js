@@ -264,7 +264,7 @@ export default Ember.Component.extend({
     },
 
     columnWidthChanged(/* column, newWidth */) {
-      // no-op
+      Ember.run.scheduleOnce('afterRender', this, this._computeCss);
     },
     viewportEntered() {
       let parentView = this.get('parentView');
