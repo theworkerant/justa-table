@@ -36,9 +36,9 @@
         {{/each}}
       {{/each}}
     {{else}}
-      {{#each table.content as |row|}}
+      {{#each table.content as |row rowIndex|}}
         <tr class="table-row {{mergedRowClasses}}" style={{rowHeight}}>
-          {{yield row}}
+          {{yield row rowIndex}}
         </tr>
       {{/each}}
     {{/if}}
