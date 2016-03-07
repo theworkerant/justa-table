@@ -12,7 +12,7 @@ const {
 export default Component.extend({
   layout,
   classNames: ['justa-table'],
-  classNameBindings: ['isLoading'],
+  classNameBindings: ['isLoading:loading:loaded', 'fixedHeight:justa-fixed-height'],
 
   init() {
     this._super(...arguments);
@@ -28,6 +28,12 @@ export default Component.extend({
     @public
   */
   paginate: false,
+
+  /**
+    If the table should have a fixed height. Setting to an integer will set the height of the table to that.
+    @public
+  */
+  fixedHeight: false,
 
   /**
     Css classes to apply to table rows.
@@ -71,27 +77,5 @@ export default Component.extend({
 
     fixedHeader.height(maxHeight);
     columnHeader.height(maxHeight);
-  },
-
-  actions: {
-    viewportEntered() {
-      if (this.getAttr('on-load-more-rows')) {
-        let returnValue = this.getAttr('on-load-more-rows');
-        let isFunction  = typeof returnValue === 'function';
-
-        Ember.assert('on-load-more-rows must use a closure action', isFunction);
-
-        let promise = this.attrs['on-load-more-rows']();
-
-        if (!promise.then) {
-          promise = new RSVP.Promise((resolve) => {
-            resolve(false);
-          });
-        }
-
-        promise.finally(() => this.set('isLoading', false));
-        return promise;
-      }
-    }
   }
 });

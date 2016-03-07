@@ -5,6 +5,10 @@ moduleForComponent('justa-table', 'Integration | Component | justa table', {
   integration: true
 });
 
+// function getContainer(context) {
+//   return context.$(`.justa-table`);
+// }
+
 function getCell(context, rowObject) {
   let { row, cell } = rowObject;
   return context.$(`tbody tr:nth-of-type(${row}) td:nth-of-type(${cell})`);
@@ -65,6 +69,50 @@ test('adds a fake rowspan class if cell content isEmpty and useFakeRowspan is tr
   `);
 
   assert.ok(getCell(this, { row: 3, cell: 1 }).hasClass('fake-rowspan'));
+});
+
+test('Places null value in a row if groupWithPriorRow is true and the prior record has the same value', function(assert) {
+  let content = [{
+      director: 'Quentin Tarantino',
+      movie: 'Pulp Fiction'
+    },
+    {
+      director: 'Quentin Tarantino',
+      movie: 'Reservoir Dogs'
+    },
+    {
+      director: 'JJ Abrams',
+      movie: 'Star Wars Episode VII'
+    },
+    {
+      director: 'Christopher Nolan',
+      movie: 'Dark Knight Rises'
+    }
+  ];
+  this.set('content', content);
+
+  this.render(hbs`
+    {{#justa-table content=content as |table|}}
+      {{#table-columns  table=table as |row|}}
+        {{table-column
+          row=row
+          headerName='director'
+          groupWithPriorRow=true
+          useFakeRowspan=true
+          valueBindingPath='director'}}
+
+
+        {{table-column
+          row=row
+          headerName='movie'
+          useFakeRowspan=true
+          valueBindingPath='movie'}}
+      {{/table-columns}}
+    {{/justa-table}}
+  `);
+  assert.equal(getCell(this, { row: 1, cell: 1 }).text().trim(), 'Quentin Tarantino', 'first cell should be Quentin Tarantino');
+  assert.equal(getCell(this, { row: 2, cell: 1 }).text().trim(), '', 'second row first cell should be empty');
+  assert.equal(getCell(this, { row: 3, cell: 1 }).text().trim(), 'JJ Abrams', 'third row first cell should be JJ Abrams');
 });
 
 test('passes rowHeight to rows', function(assert) {

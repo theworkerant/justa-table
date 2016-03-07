@@ -1,17 +1,17 @@
-<table class="table">
+<table class="table" style={{style}}>
   <thead>
     <tr>
       {{#each columns as |column|}}
         {{component column.headerComponent
           table=table
           column=column
-          classNames=column.headerClassNames
+          class=column.headerClassNames
           onColumnWidthChange=(action 'columnWidthChanged')}}
       {{/each}}
     </tr>
   </thead>
 
-  <tbody>
+  <tbody style={{tbodyStyle}}>
     {{! TODO: render diff template instead of this if }}
     {{#if table.collapsable}}
       {{#each table.content as |rowGroup|}}
@@ -38,11 +38,14 @@
         {{/if}}
       {{/each}}
     {{else}}
-      {{#each table.content as |row|}}
+      {{#each table.content as |row rowIndex|}}
         <tr class="table-row {{mergedRowClasses}}" style={{rowHeight}}>
-          {{yield row}}
+          {{yield row rowIndex}}
         </tr>
       {{/each}}
+    {{/if}}
+    {{#if paginate}}
+      {{in-viewport-checker on-enter-viewport=(action 'viewportEntered')}}
     {{/if}}
   </tbody>
 </table>

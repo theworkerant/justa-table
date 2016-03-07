@@ -44,14 +44,12 @@
     border-bottom: 1px solid #e5e5e5;
   }
 
-  .infinity-loader {
-    table {
-      position: absolute;
-      bottom: -19px;
-      left: 0px;
-      border-left: 1px solid #e5d5d5;
-      text-align: center;
-      width: 100%;
+  .justa-table-loader {
+    &:after {
+      content: 'Loading...';
+    }
+    &.loaded:after {
+      display:none;
     }
   }
 }

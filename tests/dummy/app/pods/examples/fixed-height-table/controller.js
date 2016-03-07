@@ -23,16 +23,14 @@ export default Controller.extend({
       if (this.get('onLastPage')) {
         return false;
       }
-      let newUsers = generateUsers(10);
+      let newUsers = generateUsers(10, true);
       let currentPage = this.get('page');
       let users = new A(this.get('model'));
 
       users.pushObjects(newUsers);
       this.set('page', currentPage + 1);
       return new RSVP.Promise((resolve) => {
-        Ember.run.later(this, () => {
-          resolve(users);
-        }, 1500);
+        resolve(users);
       });
     }
   }
