@@ -12,11 +12,17 @@
 
   /* TODO: pass row height in table setup when cloaking? */
   td {
+    display: none;
     // height: 32px;
     padding: 7px 10px;
     line-height: 16px;
     border-right: 1px solid #e5e5e5;
     background: none;
+  }
+
+  td.in-viewport  {
+    background-color: none;
+    display: table-cell;
   }
 
   .fixed-table-columns {

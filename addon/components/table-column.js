@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import layout from '../templates/components/table-column';
+import InViewportMixin from 'ember-in-viewport';
 
 const {
   Component,
@@ -10,11 +11,11 @@ const {
   assert
 } = Ember;
 
-export default Component.extend({
+export default Component.extend(InViewportMixin, {
   layout,
   tagName: 'td',
   attributeBindings: ['cellTitle:title'],
-  classNameBindings: ['alignCenter:center', 'alignRight:right', 'shouldUseFakeRowspan:fake-rowspan'],
+  classNameBindings: ['alignCenter:center', 'alignRight:right', 'shouldUseFakeRowspan:fake-rowspan', 'viewportEntered:in-viewport'],
   alignCenter: computed.equal('align', 'center'),
   alignRight: computed.equal('align', 'right'),
   /**
